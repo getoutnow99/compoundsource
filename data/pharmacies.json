@@ -1,0 +1,10 @@
+[
+  {"id":"Brooksville","name":"Brooksville Pharmaceuticals","location":"Brooksville, FL","price_list":"May 2026 catalog"},
+  {"id":"Aster","name":"Aster Pharmacy","location":"Wilton Manors, FL","price_list":"2025 price catalog"},
+  {"id":"APS","name":"APS","location":null,"price_list":"Pricing sheet"},
+  {"id":"Hallandale","name":"Hallandale","location":null,"price_list":"Pricing sheet"},
+  {"id":"Rite Away","name":"Rite Away","location":null,"price_list":"Pricing sheet"},
+  {"id":"Brandon","name":"Brandon","location":null,"price_list":"Pricing sheet"},
+  {"id":"Olympia","name":"Olympia","location":null,"price_list":null},
+  {"id":"Red Mountain","name":"Red Mountain Compounding","location":"Mesa, AZ","price_list":null}
+]

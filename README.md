@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CompoundSource
 
-## Getting Started
+Clinic ordering portal. Clinics sign up with the same details as the pharmacy sign-up forms, get approved, then order for a patient from one combined list of 542 compounded medications across partner pharmacies. Admins place each order in the pharmacy's own portal and track it here.
 
-First, run the development server:
+## Pages
+
+| Who | Page | What it does |
+| --- | --- | --- |
+| Public | `/` | Landing page, sign-up and sign-in links |
+| Public | `/signup` | Clinic sign-up: clinic, prescribers (license, NPI, DEA), license copies, shipping, billing (no card numbers), provider agreement, login |
+| Clinic | `/order/new` | Patient, then medications, then review with prescription upload |
+| Clinic | `/orders`, `/orders/[id]` | Order history and status, tracking |
+| Clinic | `/account` | Clinic details on file |
+| Admin | `/admin` | Order queue with counts and filters |
+| Admin | `/admin/orders/[id]` | Mark sent, shipped (with tracking), delivered, or cancel |
+| Admin | `/admin/clinics`, `/admin/clinics/[id]` | Review sign-ups, view license copies, approve or reject |
+| Admin | `/admin/medications` | Side-by-side pharmacy price list |
+
+## Run it
+
+Needs Node 20+ and Postgres 14+.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local          # set DATABASE_URL, APP_URL, ADMIN_NOTIFY_EMAIL, RESEND_API_KEY
+npx tsx --env-file=.env.local scripts/setup-db.ts             # tables + pharmacies + medications (safe to re-run)
+npx tsx --env-file=.env.local scripts/create-admin.ts you@yourdomain.com "Your Name" "a-long-password"
+npm run build && npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+To update prices, edit `data/medications.json` and re-run `setup-db.ts`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `DATABASE_URL`: Postgres connection string.
+- `APP_URL`: public address, used in email links (for example `https://compoundsource.com`).
+- `ADMIN_NOTIFY_EMAIL`: where new sign-up and new order alerts go.
+- `RESEND_API_KEY`, `EMAIL_FROM`: email sending through Resend. Without a key, emails are printed to the server log.
 
-## Learn More
+## Privacy and security (HIPAA)
 
-To learn more about Next.js, take a look at the following resources:
+The site stores patient names, birth dates, addresses and prescriptions, so it must run on hosting that signs a Business Associate Agreement (BAA), for both the server and the database. Options: AWS (BAA free in AWS Artifact), or Vercel Pro/Enterprise with a HIPAA add-on plus Supabase Team with the HIPAA add-on. The email provider never receives patient data: emails only carry clinic names, order numbers and links.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Built in: hashed passwords (bcrypt), sessions that expire after 60 minutes idle or 12 hours, audit log of every view and change to orders and clinics, file downloads only for the owning clinic or an admin, security headers, no card numbers collected.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Before launch: legal review of `src/lib/agreement.ts` and of how clinic membership fees are charged (Anti-Kickback Statute, Florida Patient Brokering Act), HTTPS on the domain, database backups.
